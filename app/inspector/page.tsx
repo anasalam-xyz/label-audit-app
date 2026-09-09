@@ -23,10 +23,6 @@ export default function InspectorHomePage() {
   
   return (
     <main className="mx-auto min-h-screen max-w-md bg-bg pb-32">
-      {/* ---- Topbar ---- */}
-      <header className="flex items-center justify-between px-5 pt-6 pb-4">
-        <Topbar/>        
-      </header>
 
       {/* ---- Summary card ---- */}
       <section className="mx-5 mb-5 rounded-card bg-dark px-5 py-5 text-white">
@@ -107,10 +103,6 @@ export default function InspectorHomePage() {
           ))}
         </ul>
       </section>
-
-      {/* ---- Floating bottom nav ---- */}
-      <Navbar/>      
-
     </main>
   );
 }
