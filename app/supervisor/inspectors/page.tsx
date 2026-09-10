@@ -3,25 +3,23 @@
 import { useEffect, useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { IconPlaceholder } from "@/components/ui/icon-placeholder";
-import { StatusChip } from "@/components/ui/statusChip";
-import { fetchHistory } from "@/lib/api/history";
-import type { Scan } from "@/lib/mock-scans";
+import { fetchInspectors, type InspectorSummary } from "@/lib/api/inspectors";
 
-export default function HistoryPage() {
-  const [scans, setScans] = useState<Scan[]>([]);
+export default function ManageInspectorsPage() {
+  const [inspectors, setInspectors] = useState<InspectorSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchHistory()
-      .then(setScans)
+    fetchInspectors()
+      .then(setInspectors)
       .catch((err) => setError(err instanceof Error ? err.message : "Failed to load"))
       .finally(() => setIsLoading(false));
   }, []);
 
   return (
     <main className="mx-auto min-h-screen max-w-md bg-bg px-5 pt-6 pb-28">
-      <h1 className="mb-4 text-lg font-semibold text-ink">Scan History</h1>
+      <h1 className="mb-4 text-lg font-semibold text-ink">Inspectors</h1>
 
       {error && (
         <div className="mb-4 flex items-center gap-2 rounded-card border border-violation/30 bg-violation-bg px-4 py-3">
@@ -34,25 +32,24 @@ export default function HistoryPage() {
         <p className="text-sm text-muted">Loading…</p>
       ) : (
         <ul className="divide-y divide-border rounded-card border border-border bg-surface">
-          {scans.map((scan) => (
-            <li key={scan.id} className="flex items-center justify-between gap-3 px-4 py-3">
+          {inspectors.map((insp) => (
+            <li key={insp.id} className="flex items-center justify-between gap-3 px-4 py-3">
               <div className="flex items-center gap-3">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg text-muted">
                   <IconPlaceholder size={16} />
                 </span>
                 <div>
-                  <p className="text-sm font-medium text-ink">{scan.product}</p>
-                  <p className="text-xs text-muted">{scan.time}</p>
+                  <p className="text-sm font-medium text-ink">{insp.name}</p>
+                  <p className="text-xs text-muted">{insp.region}</p>
                 </div>
               </div>
-              <StatusChip status={scan.status} />
+              <div className="text-right">
+                <p className="text-sm font-medium text-ink">{insp.scans_this_week} scans</p>
+                <p className="text-xs text-violation">{insp.violations_flagged} flagged</p>
+              </div>
             </li>
           ))}
         </ul>
-      )}
-
-      {!isLoading && !error && scans.length === 0 && (
-        <p className="mt-6 text-center text-sm text-muted">No scans yet.</p>
       )}
     </main>
   );

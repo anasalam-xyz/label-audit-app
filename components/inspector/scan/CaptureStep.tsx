@@ -12,7 +12,7 @@ export function CaptureStep({
 }: {
   isBatchMode: boolean;
   batchCount: number;
-  onCaptured: (url: string) => void;
+  onCaptured: (url: string, file: File) => void;
   onProcessBatch: () => void;
   onCancel: () => void;
 }) {
@@ -21,7 +21,7 @@ export function CaptureStep({
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    onCaptured(URL.createObjectURL(file));
+    onCaptured(URL.createObjectURL(file), file);
     e.target.value = "";
   }
 

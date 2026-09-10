@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/inspector/Navbar";
 import Topbar from "@/components/inspector/Topbar";
-import { getToken } from "@/lib/auth-storage";
+import Navbar from "@/components/supervisor/Navbar";
+import { getToken, getStoredUser } from "@/lib/auth-storage";
 
-export default function InspectorLayout({
+export default function SupervisorLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -15,8 +15,14 @@ export default function InspectorLayout({
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    if (!getToken()) {
+    const token = getToken();
+    const user = getStoredUser();
+    if (!token) {
       router.replace("/login");
+      return;
+    }
+    if (user?.role === "inspector") {
+      router.replace("/inspector");
       return;
     }
     setIsChecking(false);
