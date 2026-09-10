@@ -1,26 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  /* ---- brand / structural ---- */
-  --color-dark: #201712;      /* cards, bottom nav, primary fills — warm near-black */
-  --color-accent: #FF6B1A;    /* orange — CTA highlights, active nav */
-  --color-bg: #FAF6F2;        /* warm off-white page background */
+  /* ---- structural ---- */
+  --color-bg: #F1EBDE;
   --color-surface: #FFFFFF;
-  --color-ink: #201712;
-  --color-muted: #8C7B6F;
-  --color-border: #EFE7DF;
+  --color-ink: #1A1A1A;
+  --color-dark: #141414;
+  --color-muted: #8C8577;
+  --color-border: #E6DFD0;
 
-  /* ---- status (functional — kept distinct from orange accent) ---- */
+  /* ---- accent (CTA + wipe animation) ---- */
+  --color-accent: #eba654;
+  --color-accent-ink: #1A1A1A;
+
+  /* ---- status (kept distinct from the new orange accent) ---- */
   --color-pass: #16A34A;
   --color-pass-bg: #ECFDF3;
   --color-violation: #DC2626;
   --color-violation-bg: #FEF2F2;
-  --color-review: #CA8A04;    /* gold, not orange — avoids clashing with accent */
-  --color-review-bg: #FEF9E7;
+  --color-review: #A16207;
+  --color-review-bg: #FEF3C7;
 
   /* ---- type: unchanged ---- */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'DM Sans', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
   --text-*: initial;
   --text-xs: 0.75rem;
   --text-xs--line-height: 1rem;
@@ -33,7 +37,7 @@
   --text-2xl: 1.5rem;
   --text-2xl--line-height: 2rem;
 
-  --radius-card: 1.25rem;
+  --radius-card: 1.5rem;
 }
 
 body {
