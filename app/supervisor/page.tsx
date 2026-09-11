@@ -289,7 +289,7 @@ export default function Page() {
               <Scale className="h-5 w-5" />
             </span>
             <div>
-              <p className="font-display text-lg leading-tight text-[#14213D]">Supervisor Console</p>
+              <p className="font-display text-md leading-tight text-[#14213D]">Supervisor Console</p>
               <p className="text-xs text-stone-400">Legal Metrology (Packaged Commodities) Rules, 2011</p>
             </div>
           </div>
@@ -301,7 +301,7 @@ export default function Page() {
 
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <p className="text-sm font-medium text-[#14213D]">Deputy Controller, Zone III</p>
+              <p className="text-sm md:text-sm font-medium text-[#14213D]">Deputy Controller, Zone III</p>
               <p className="text-xs text-stone-400">Friday, 11 Sept 2026</p>
             </div>
             <span className="hidden md:flex h-9 w-9 items-center justify-center rounded-full bg-[#B8873D]/15 font-display text-sm text-[#8A6529]">
