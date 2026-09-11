@@ -282,7 +282,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-[#F1F2ED] pb-16">
       {/* Header */}
-      <header className="border-b border-stone-200 bg-white/70 px-8 py-6 backdrop-blur">
+      <header className="border-b border-stone-200 bg-white/70 px-8 py-4 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#14213D] text-white">
@@ -304,7 +304,7 @@ export default function Page() {
               <p className="text-sm font-medium text-[#14213D]">Deputy Controller, Zone III</p>
               <p className="text-xs text-stone-400">Friday, 11 Sept 2026</p>
             </div>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#B8873D]/15 font-display text-sm text-[#8A6529]">
+            <span className="hidden md:flex h-9 w-9 items-center justify-center rounded-full bg-[#B8873D]/15 font-display text-sm text-[#8A6529]">
               DC
             </span>
           </div>
@@ -313,7 +313,7 @@ export default function Page() {
 
       <main className="mx-auto mt-8 max-w-6xl px-8">
         {/* Stat row */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:grid-cols-4">
           <CircularStat
             label="Compliance rate"
             value={78}
