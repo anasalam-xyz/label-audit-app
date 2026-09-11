@@ -25,7 +25,7 @@ export default function Topbar() {
           <UserRound size={20} />
         </span>
         <div>
-          <p className="text-xs text-muted">Welcome Back 👋</p>
+          <p className="text-xs text-muted">Welcome Back</p>
           <p className="text-base font-semibold text-ink">{name ?? "…"}</p>
         </div>
       </div>

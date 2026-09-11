@@ -5,8 +5,8 @@ import { usePathname } from "next/navigation";
 import { ClipboardClock, ScanSquare, LayoutDashboard } from "lucide-react";
 
 const LINKS = [
+  { href: "/inspector/scan", label: "Scan", icon: ScanSquare },
   { href: "/inspector/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/inspector", label: "Scan", icon: ScanSquare },
   { href: "/inspector/history", label: "History", icon: ClipboardClock },
 ];
 

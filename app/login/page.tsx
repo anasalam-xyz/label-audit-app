@@ -19,7 +19,7 @@ const DEMO_ACCOUNTS = [
 ];
 
 const ROLE_DESTINATION: Record<string, string> = {
-  inspector: "/inspector",
+  inspector: "/inspector/dashboard",
   supervisor: "/supervisor",
   admin: "/supervisor",
 };

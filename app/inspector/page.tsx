@@ -1,107 +1,119 @@
 "use client";
 
-import { redirect } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Camera, Layers, ChevronRight, AlertCircle } from "lucide-react";
 import { IconPlaceholder } from "@/components/ui/icon-placeholder";
 import { StatusChip } from "@/components/ui/statusChip";
-import { mockScans, type Scan, type ScanStatus } from "@/lib/mock-scans";
-import Navbar from "@/components/inspector/Navbar";
-import Topbar from "@/components/inspector/Topbar";
-import { ScanLine, ScanBox, CircleSmall } from "lucide-react";
-
-const RESULT_POOL: ScanStatus[] = ["pass", "violation", "review"];
+import { RingProgress } from "@/components/ui/RingProgress";
+import { fetchHistory } from "@/lib/api/history";
+import type { Scan } from "@/lib/mock-scans";
 
 export default function InspectorHomePage() {
-  const [scans, setScans] = useState<Scan[]>(mockScans);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [scans, setScans] = useState<Scan[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const violations = scans.filter((s) => s.status === "violation").length;
-  const complianceRate = Math.round(
-    (scans.filter((s) => s.status === "pass").length / scans.length) * 100
-  );
+  useEffect(() => {
+    fetchHistory()
+      .then(setScans)
+      .catch((err) => setError(err instanceof Error ? err.message : "Failed to load"))
+      .finally(() => setIsLoading(false));
+  }, []);
 
-  
+  const total = scans.length;
+  const passed = scans.filter((s) => s.status === "pass").length;
+  const complianceRate = total > 0 ? Math.round((passed / total) * 100) : 0;
+  const preview = scans.slice(0, 3);
+  const remaining = Math.max(scans.length - 3, 0);
+
   return (
-    <main className="mx-auto min-h-screen max-w-md bg-bg pb-32">
+    <main className="mx-auto min-h-screen max-w-md bg-bg px-5 pb-28">
+      <h1 className="mb-5 text-2xl font-semibold leading-snug text-ink">
+        Let&apos;s check some <span className="text-accent">Labels</span>
+      </h1>
 
-      {/* ---- Summary card ---- */}
-      <section className="mx-5 mb-5 rounded-card bg-dark px-5 py-5 text-white">
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-white/60">Today&apos;s Scans</p>
-          <span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-dark">
-            This Week
-          </span>
+      {error && (
+        <div className="mb-4 flex items-center gap-2 rounded-card border border-violation/30 bg-violation-bg px-4 py-3">
+          <AlertCircle size={16} className="text-violation" />
+          <p className="text-sm text-violation">{error}</p>
         </div>
-        <p className="mt-2 text-2xl font-semibold">{scans.length}</p>
+      )}
 
-        <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-4">
-          <div>
-            <p className="text-xs text-white/60">Flags Raised</p>
-            <p className="text-base font-semibold text-violation">{violations}</p>
-          </div>
-          <div>
-            <p className="text-xs text-white/60">Compliance Rate</p>
-            <p className="text-base font-semibold">{complianceRate}%</p>
-          </div>
+      <section className="mb-6 flex items-center justify-between rounded-card bg-dark px-5 py-5 text-white">
+        <div>
+          <p className="text-sm text-white/60">
+            {isLoading ? "Loading…" : `${total} scans logged`}
+          </p>
+          <p className="mt-1 text-lg font-semibold">{complianceRate}% compliant</p>
+          <Link
+            href="/inspector/scan"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-xs font-semibold text-accent-ink"
+          >
+            <Camera size={14} />
+            Scan Now
+          </Link>
+        </div>
+
+        <div className="relative flex h-24 w-24 shrink-0 items-center justify-center">
+          <RingProgress percentage={complianceRate} />
+          <span className="absolute text-base font-semibold">{complianceRate}%</span>
         </div>
       </section>
 
-      {/* ---- Actions ---- */}
-      <section className="mx-5 mb-6 grid grid-cols-2 gap-3">
-        <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="hidden"
-        />
-
-        <button
-          onClick={() => redirect("/inspector/scan")}
-          disabled={isProcessing}
-          className="flex flex-col items-center gap-2 rounded-card border border-border bg-surface py-4 disabled:opacity-60"
+      <section className="mb-6 flex gap-3">
+        <Link
+          href="/inspector/scan"
+          className="flex flex-1 items-center justify-center gap-2 rounded-card border border-border bg-surface py-3 text-sm font-medium text-ink"
         >
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-dark">
-            <ScanLine size={22} />
-          </span>
-          <span className="text-sm font-medium text-ink">
-            {isProcessing ? "Reading…" : "Scan"}
-          </span>
-        </button>
-
-        <button 
-          onClick={() => redirect("/inspector/scan?batch=true")}
-          className="flex flex-col items-center gap-2 rounded-card border border-border bg-surface py-4 cursor-pointer"
+          <Camera size={16} />
+          Scan
+        </Link>
+        <Link
+          href="/inspector/scan?batch=true"
+          className="flex flex-1 items-center justify-center gap-2 rounded-card border border-border bg-surface py-3 text-sm font-medium text-ink"
         >
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-bg text-ink">
-            <ScanBox size={22} />
-          </span>
-          <span className="text-sm font-medium text-ink">Batch Mode</span>
-        </button>
+          <Layers size={16} />
+          Batch Mode
+        </Link>
       </section>
 
-      {/* ---- Recent Activity ---- */}
-      <section className="mx-5">
+      <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-ink">Recent Activity</h2>
-          <button className="text-sm text-muted">See all</button>
+          <h2 className="text-lg font-semibold text-ink">Recent Scans</h2>
+          <Link href="/inspector/history" className="text-sm text-muted">
+            See all
+          </Link>
         </div>
 
-        <ul className="divide-y divide-border rounded-card border border-border bg-surface">
-          {scans.map((scan) => (
-            <li key={scan.id} className="flex items-center justify-between gap-3 px-4 py-3">
-              <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg text-muted">
-                  <CircleSmall size={16} />
+        {isLoading ? (
+          <p className="text-sm text-muted">Loading…</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {preview.map((scan) => (
+              <div key={scan.id} className="rounded-card border border-border bg-surface p-4">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-bg text-muted">
+                  <IconPlaceholder size={14} />
                 </span>
-                <div>
-                  <p className="text-sm font-medium text-ink">{scan.product}</p>
-                  <p className="text-xs text-muted">{scan.time}</p>
+                <p className="mt-3 text-sm font-medium text-ink">{scan.product}</p>
+                <p className="mt-0.5 text-xs text-muted">{scan.time}</p>
+                <div className="mt-3">
+                  <StatusChip status={scan.status} />
                 </div>
               </div>
-              <StatusChip status={scan.status} />
-            </li>
-          ))}
-        </ul>
+            ))}
+
+            <Link
+              href="/inspector/history"
+              className="flex flex-col items-center justify-center gap-1 rounded-card bg-dark p-4 text-center text-white"
+            >
+              <ChevronRight size={18} />
+              <span className="text-xs font-medium">
+                {remaining > 0 ? `+${remaining} more` : "View log"}
+              </span>
+            </Link>
+          </div>
+        )}
       </section>
     </main>
   );
