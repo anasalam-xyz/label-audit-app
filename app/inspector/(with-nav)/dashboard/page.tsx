@@ -105,7 +105,7 @@ export default function InspectorHomePage() {
 
             <Link
               href="/inspector/history"
-              className="flex flex-col items-center justify-center gap-1 rounded-card bg-dark p-4 text-center text-white"
+              className="flex flex-col items-center justify-center gap-1 rounded-card bg-muted p-4 text-center text-white"
             >
               <ChevronRight size={18} />
               <span className="text-xs font-medium">

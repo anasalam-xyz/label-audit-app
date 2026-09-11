@@ -109,7 +109,7 @@ function ScanFlow() {
           batchCount={batchQueue.length}
           onCaptured={handleCaptured}
           onProcessBatch={() => proceedToBarcode(null as unknown as File)}
-          onCancel={() => router.push("/inspector")}
+          onCancel={() => router.push("/inspector/dashboard")}
         />
       )}
 
@@ -145,7 +145,7 @@ function ScanFlow() {
           passed={violations.length === 0}
           isOnline={isOnline}
           onScanAnother={reset}
-          onGoHome={() => router.push("/inspector")}
+          onGoHome={() => router.push("/inspector/dashboard")}
         />
       )}
     </main>
