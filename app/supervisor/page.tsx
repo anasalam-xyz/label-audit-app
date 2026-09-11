@@ -351,9 +351,9 @@ export default function Page() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="font-display text-xl text-[#14213D]">Escalated cases</h2>
-                <p className="text-sm text-stone-400">Sent to you by field inspectors for review</p>
+                <p className="text-xs px-2 text-stone-400">Sent to you by field inspectors for review</p>
               </div>
-              <span className="rounded-full bg-[#14213D] px-3 py-1 text-xs font-medium text-white">
+              <span className="w-[40%] md:w-fit rounded-full bg-[#14213D] px-3 py-1 text-xs font-medium text-white">
                 {CASES.length} this cycle
               </span>
             </div>

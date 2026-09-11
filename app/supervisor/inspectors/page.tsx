@@ -307,7 +307,7 @@ function InspectorRow({ insp, index }: { insp: Inspector; index: number }) {
       </div>
 
       {/* Accuracy ring */}
-      <div className="flex items-center justify-end gap-2 max-lg:col-start-2 max-lg:row-start-1">
+      <div className="hidden md:flex items-center justify-end gap-2 max-lg:col-start-2 max-lg:row-start-1">
         <AccuracyRing value={insp.accuracyRate} />
       </div>
     </motion.div>
