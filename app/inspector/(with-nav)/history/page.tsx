@@ -18,6 +18,15 @@ function parseHour(time: string): number {
   return hour;
 }
 
+// Local YYYY-MM-DD — deliberately not toISOString(), which converts to UTC
+// and can shift the date across a day boundary depending on timezone.
+function toDateParam(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 export default function HistoryPage() {
   const [scans, setScans] = useState<Scan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,11 +34,13 @@ export default function HistoryPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
-    fetchHistory()
+    setIsLoading(true);
+    setError(null);
+    fetchHistory(toDateParam(selectedDate))
       .then(setScans)
       .catch((err) => setError(err instanceof Error ? err.message : "Failed to load"))
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [selectedDate]); // FIX: previously [] — date selection updated state but never refetched
 
   const grouped = useMemo(() => {
     const buckets = new Map<number, Scan[]>();
@@ -58,7 +69,7 @@ export default function HistoryPage() {
         {isLoading ? (
           <p className="text-sm text-muted">Loading…</p>
         ) : grouped.length === 0 ? (
-          <p className="mt-6 text-center text-sm text-muted">No scans yet.</p>
+          <p className="mt-6 text-center text-sm text-muted">No scans on this day.</p>
         ) : (
           <div className="space-y-5">
             {grouped.map(([hour, entries]) => (

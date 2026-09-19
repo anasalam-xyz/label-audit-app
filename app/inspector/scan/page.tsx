@@ -8,7 +8,7 @@ import { ProcessingStep } from "@/components/inspector/scan/ProcessingStep";
 import { ReviewStep } from "@/components/inspector/scan/ReviewStep";
 import { ResultStep } from "@/components/inspector/scan/ResultStep";
 import { DoneStep } from "@/components/inspector/scan/DoneStep";
-import { extractFields, checkCompliance } from "@/lib/api/scans";
+import { extractFields, checkCompliance, saveScan } from "@/lib/api/scans";
 import { generateExtraction } from "@/lib/mock-extraction"; // batch mode only — see note below
 import type { ExtractedField, ScanStep, Violation } from "@/lib/scan-types";
 
@@ -19,6 +19,7 @@ function ScanFlow() {
 
   const [step, setStep] = useState<ScanStep>("capture");
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [batchQueue, setBatchQueue] = useState<string[]>([]);
   const [fields, setFields] = useState<ExtractedField[]>([]);
   const [violations, setViolations] = useState<Violation[]>([]);
@@ -31,6 +32,7 @@ function ScanFlow() {
       setBatchQueue((prev) => [...prev, url]);
       return; // stay on capture step for the next shot
     }
+    setPhotoFile(file); // kept for the real /scans/save call later in the flow
     proceedToBarcode(file);
   }
 
@@ -68,21 +70,39 @@ function ScanFlow() {
     }
   }
 
-  function proceedToSave() {
+  async function proceedToSave() {
+    // Batch mode has no real save endpoint yet (backend batch scope is
+    // still fake) — keep the cosmetic beat there, matching current scope.
+    if (isBatchMode || !photoFile) {
+      setStep("saving");
+      setTimeout(() => {
+        setStep("syncing");
+        setTimeout(() => {
+          setIsOnline(typeof navigator !== "undefined" ? navigator.onLine : true);
+          setStep("done");
+        }, 900);
+      }, 900);
+      return;
+    }
+
     setStep("saving");
-    // no save/sync endpoint in current backend scope — kept as a UI beat
-    setTimeout(() => {
+    try {
+      await saveScan(photoFile, fields, violations);
       setStep("syncing");
       setTimeout(() => {
         setIsOnline(typeof navigator !== "undefined" ? navigator.onLine : true);
         setStep("done");
       }, 900);
-    }, 900);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : "Save failed — try again");
+      setStep("result"); // back to result, not capture — extraction/check already succeeded
+    }
   }
 
   function reset() {
     setStep("capture");
     setPhotoUrl(null);
+    setPhotoFile(null);
     setBatchQueue([]);
     setFields([]);
     setViolations([]);
