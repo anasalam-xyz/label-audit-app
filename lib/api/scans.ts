@@ -3,8 +3,6 @@ import type { ExtractedField, Violation } from "../scan-types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-// Backend wire shape (snake_case) vs frontend ExtractedField/Violation
-// (camelCase) — kept explicit here rather than relying on lucky pass-through.
 type WireField = {
   id: string;
   field_key: string;
@@ -31,12 +29,19 @@ function toWireViolation(v: Violation): WireViolation {
   return { rule_code: v.ruleCode, severity: v.severity, explanation: v.explanation };
 }
 
-export async function extractFields(photo: File): Promise<ExtractedField[]> {
+export async function extractFields(
+  photo: File,
+  options?: { provider?: "groq" }
+): Promise<ExtractedField[]> {
   const token = getToken();
   const formData = new FormData();
   formData.append("photo", photo);
 
-  const res = await fetch(`${API_BASE}/scans/extract`, {
+  // provider=groq forces the fast path directly — used by batch mode, where
+  // per-item latency compounds across a burst of photos.
+  const query = options?.provider ? `?provider=${options.provider}` : "";
+
+  const res = await fetch(`${API_BASE}/scans/extract${query}`, {
     method: "POST",
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     body: formData,
@@ -48,9 +53,6 @@ export async function extractFields(photo: File): Promise<ExtractedField[]> {
   }
 
   const data = await res.json();
-  // FIX: backend returns field_key (snake_case) — this was previously
-  // returned unconverted, so `fields` state secretly held snake_case
-  // objects mislabeled with the camelCase ExtractedField type.
   return (data.fields as WireField[]).map(toFrontendField);
 }
 
@@ -72,8 +74,6 @@ export async function checkCompliance(fields: ExtractedField[]): Promise<Violati
   }
 
   const data = await res.json();
-  // FIX: `severity` was previously dropped in this mapping — every
-  // violation lost its major/minor flag on the way into frontend state.
   return (data.violations as WireViolation[]).map((v) => ({
     ruleCode: v.rule_code,
     severity: v.severity,
