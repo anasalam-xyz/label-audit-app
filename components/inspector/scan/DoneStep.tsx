@@ -1,18 +1,42 @@
 "use client";
 
-import { CheckCircle2, Cloud, CloudOff } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2, Cloud, CloudOff, FileDown, Loader2 } from "lucide-react";
+import { generateComplianceReportPdf } from "@/lib/pdf-report";
+import type { ExtractedField, Violation } from "@/lib/scan-types";
 
 export function DoneStep({
   passed,
   isOnline,
   onScanAnother,
   onGoHome,
+  fields,
+  violations,
+  photo,
+  scanId,
+  scannedAt,
 }: {
   passed: boolean;
   isOnline: boolean;
   onScanAnother: () => void;
   onGoHome: () => void;
+  fields: ExtractedField[];
+  violations: Violation[];
+  photo: File | null;
+  scanId?: string;
+  scannedAt?: string;
 }) {
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  async function handleDownloadPdf() {
+    setIsGeneratingPdf(true);
+    try {
+      await generateComplianceReportPdf({ photo, fields, violations, scanId, scannedAt });
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  }
+
   return (
     <div className="flex flex-col items-center py-16 text-center">
       <CheckCircle2 size={40} className="mb-3 text-pass" />
@@ -27,12 +51,30 @@ export function DoneStep({
       </div>
 
       <div className="mt-8 flex w-full flex-col gap-3">
-        <button
+        {/* No photo means this was the batch-mode cosmetic save path — no
+            real scan record exists yet to build a report from. */}
+         <button
           onClick={onScanAnother}
           className="rounded-card bg-dark px-4 py-3 text-sm font-semibold text-white"
         >
           Scan Another
         </button>
+
+        {photo && (
+          <button
+            onClick={handleDownloadPdf}
+            disabled={isGeneratingPdf}
+            className="flex items-center justify-center gap-2 rounded-card border border-border bg-surface px-4 py-3 text-sm font-semibold text-ink disabled:opacity-60"
+          >
+            {isGeneratingPdf ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <FileDown size={16} />
+            )}
+            {isGeneratingPdf ? "Generating…" : "Download PDF Report"}
+          </button>
+        )}
+       
         <button
           onClick={onGoHome}
           className="rounded-card border border-border bg-surface px-4 py-3 text-sm font-semibold text-ink"

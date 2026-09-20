@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Camera, X, ArrowRight } from "lucide-react";
+import { Camera, Image as ImageIcon, X, ArrowRight } from "lucide-react";
 
 export function CaptureStep({
   isBatchMode,
@@ -16,7 +16,8 @@ export function CaptureStep({
   onProcessBatch: () => void;
   onCancel: () => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -37,11 +38,20 @@ export function CaptureStep({
         <span className="w-[22px]" />
       </div>
 
+      {/* Camera capture — capture="environment" opens the device camera directly */}
       <input
-        ref={inputRef}
+        ref={cameraInputRef}
         type="file"
         accept="image/*"
         capture="environment"
+        onChange={handleFile}
+        className="hidden"
+      />
+      {/* Gallery picker — no `capture` attribute, so the OS shows the photo library/file picker instead */}
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
         onChange={handleFile}
         className="hidden"
       />
@@ -53,10 +63,18 @@ export function CaptureStep({
       </div>
 
       <button
-        onClick={() => inputRef.current?.click()}
+        onClick={() => cameraInputRef.current?.click()}
         className="mt-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent text-dark shadow-md"
       >
         <Camera size={26} />
+      </button>
+
+      <button
+        onClick={() => galleryInputRef.current?.click()}
+        className="mt-4 flex items-center gap-1.5 text-xs font-medium text-muted"
+      >
+        <ImageIcon size={14} />
+        Upload from Gallery
       </button>
 
       {isBatchMode && batchCount > 0 && (

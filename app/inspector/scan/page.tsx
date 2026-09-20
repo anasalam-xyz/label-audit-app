@@ -25,6 +25,7 @@ function ScanFlow() {
   const [violations, setViolations] = useState<Violation[]>([]);
   const [isOnline, setIsOnline] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [saveResult, setSaveResult] = useState<{ id: string; scannedAt: string } | null>(null);
 
   function handleCaptured(url: string, file: File) {
     setPhotoUrl(url);
@@ -87,7 +88,8 @@ function ScanFlow() {
 
     setStep("saving");
     try {
-      await saveScan(photoFile, fields, violations);
+      const result = await saveScan(photoFile, fields, violations);
+      setSaveResult({ id: result.id, scannedAt: result.scannedAt });
       setStep("syncing");
       setTimeout(() => {
         setIsOnline(typeof navigator !== "undefined" ? navigator.onLine : true);
@@ -107,6 +109,7 @@ function ScanFlow() {
     setFields([]);
     setViolations([]);
     setErrorMessage(null);
+    setSaveResult(null);
   }
 
   return (
@@ -166,6 +169,11 @@ function ScanFlow() {
           isOnline={isOnline}
           onScanAnother={reset}
           onGoHome={() => router.push("/inspector/dashboard")}
+          fields={fields}
+          violations={violations}
+          photo={photoFile}
+          scanId={saveResult?.id}
+          scannedAt={saveResult?.scannedAt}
         />
       )}
     </main>
