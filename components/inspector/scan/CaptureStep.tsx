@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { motion } from "framer-motion";
 import { Camera, Image as ImageIcon, X, ArrowRight } from "lucide-react";
 
 export function CaptureStep({
@@ -32,13 +33,12 @@ export function CaptureStep({
         <button onClick={onCancel} className="text-muted">
           <X size={22} />
         </button>
-        <p className="text-sm font-medium text-ink">
+        <p className="font-body text-sm font-medium text-ink">
           {isBatchMode ? `Batch Mode — ${batchCount} captured` : "Scan Label"}
         </p>
         <span className="w-[22px]" />
       </div>
 
-      {/* Camera capture — capture="environment" opens the device camera directly */}
       <input
         ref={cameraInputRef}
         type="file"
@@ -47,7 +47,6 @@ export function CaptureStep({
         onChange={handleFile}
         className="hidden"
       />
-      {/* Gallery picker — no `capture` attribute, so the OS shows the photo library/file picker instead */}
       <input
         ref={galleryInputRef}
         type="file"
@@ -57,34 +56,37 @@ export function CaptureStep({
       />
 
       <div className="flex aspect-[3/4] w-full items-center justify-center rounded-card border-2 border-dashed border-border bg-surface">
-        <p className="px-8 text-center text-sm text-muted">
+        <p className="font-body px-8 text-center text-sm text-muted">
           Position the label inside the frame
         </p>
       </div>
 
-      <button
+      <motion.button
+        whileTap={{ scale: 0.92 }}
         onClick={() => cameraInputRef.current?.click()}
         className="mt-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent text-dark shadow-md"
       >
         <Camera size={26} />
-      </button>
+      </motion.button>
 
-      <button
+      <motion.button
+        whileTap={{ scale: 0.96 }}
         onClick={() => galleryInputRef.current?.click()}
-        className="mt-4 flex items-center gap-1.5 text-xs font-medium text-muted"
+        className="font-body mt-4 flex items-center gap-1.5 text-xs font-medium text-muted"
       >
         <ImageIcon size={14} />
         Upload from Gallery
-      </button>
+      </motion.button>
 
       {isBatchMode && batchCount > 0 && (
-        <button
+        <motion.button
+          whileTap={{ scale: 0.97 }}
           onClick={onProcessBatch}
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-card bg-dark px-4 py-3 text-sm font-semibold text-white"
+          className="font-body mt-6 flex w-full items-center justify-center gap-2 rounded-card bg-dark px-4 py-3 text-sm font-semibold text-white"
         >
           Process {batchCount} Photo{batchCount > 1 ? "s" : ""}
           <ArrowRight size={16} />
-        </button>
+        </motion.button>
       )}
     </div>
   );

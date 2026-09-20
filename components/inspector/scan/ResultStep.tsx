@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { SegmentedScoreRing } from "@/components/ui/SegmentedScoreRing";
 import { RULE_ASPECTS } from "@/lib/rule-aspects";
@@ -25,7 +26,7 @@ export function ResultStep({
       <div className="mb-6 flex flex-col items-center">
         <SegmentedScoreRing segments={checkedAspects} />
         <p
-          className={`mt-4 font-display text-xl font-semibold ${
+          className={`font-display mt-4 text-xl font-semibold ${
             allPassed ? "text-pass" : "text-violation"
           }`}
         >
@@ -76,12 +77,13 @@ export function ResultStep({
         ))}
       </div>
 
-      <button
+      <motion.button
+        whileTap={{ scale: 0.97 }}
         onClick={onSave}
         className="font-body flex w-full items-center justify-center rounded-card bg-dark px-4 py-3 text-sm font-semibold text-white"
       >
         Save Report
-      </button>
+      </motion.button>
     </div>
   );
 }
