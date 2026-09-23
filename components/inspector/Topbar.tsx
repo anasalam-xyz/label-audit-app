@@ -51,7 +51,7 @@ export default function Topbar() {
   }
 
   return (
-    <header className="mb-2 shadow-sm border-muted flex items-center justify-between px-5 py-3">
+   <header className="relative mb-2 shadow-sm border-muted flex items-center justify-between px-5 py-3">
     
       <div className="flex items-center gap-3.5">
         <div className="relative">
@@ -75,7 +75,7 @@ export default function Topbar() {
       {/* Actions */}
       <div className="flex items-center gap-2">
         {/* Notifications */}
-        <div ref={notificationRef} className="relative">
+        <div ref={notificationRef}>
           <button
             type="button"
             onClick={() => setShowNotifications((current) => !current)}
@@ -112,7 +112,7 @@ export default function Topbar() {
           {/* Notification popover */}
           <div
             className={[
-              "absolute right-0 top-[calc(100%+0.75rem)] z-50 w-80 origin-top-right",
+              "absolute right-5 top-[calc(100%+0.75rem)] z-50 w-[min(20rem,calc(100vw-2.5rem))] origin-top-right",
               "transition-all duration-200 ease-out",
               showNotifications
                 ? "pointer-events-auto translate-y-0 scale-100 opacity-100"

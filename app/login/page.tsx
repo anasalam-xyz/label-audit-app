@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, HelpCircle } from "lucide-react";
+import { ArrowRight, HelpCircle, X } from "lucide-react";
 import { login } from "@/lib/api/auth";
 import { setSession } from "@/lib/auth-storage";
 import { ApiError } from "@/lib/api/client";
@@ -13,9 +13,14 @@ import { DesktopRoleImages } from "@/components/auth/DesktopRoleImages";
 import { AnimatePresence, motion } from "framer-motion";
 
 const DEMO_ACCOUNTS = [
-  { email: "rakesh@labelaudit.gov.in", password: "inspector123", name: "Rakesh Kumar", role: "inspector" as const },
-  { email: "anjali@labelaudit.gov.in", password: "inspector123", name: "Anjali Verma", role: "inspector" as const },
-  { email: "suresh@labelaudit.gov.in", password: "supervisor123", name: "Suresh Prasad", role: "supervisor" as const },
+  { email: "priya.sen@labelaudit.gov.in", password: "supervisor123", name: "Priya Sen", role: "supervisor" as const },
+  { email: "anas.alam@labelaudit.gov.in", password: "inspector123", name: "Anas Alam", role: "inspector" as const },
+  { email: "pawan.sen@labelaudit.gov.in", password: "inspector123", name: "Pawan Sen", role: "inspector" as const },
+  { email: "yuvraj.singh@labelaudit.gov.in", password: "inspector123", name: "Yuvraj Singh", role: "inspector" as const },
+  { email: "shreya.singh@labelaudit.gov.in", password: "supervisor123", name: "Shreya Singh", role: "supervisor" as const },
+  { email: "sakshi.soni@labelaudit.gov.in", password: "inspector123", name: "Sakshi Soni", role: "inspector" as const },
+  { email: "swapnil.pathak@labelaudit.gov.in", password: "inspector123", name: "Swapnil Pathak", role: "inspector" as const },
+  { email: "anushka.priya@labelaudit.gov.in", password: "inspector123", name: "Anushka Priya", role: "inspector" as const },
 ];
 
 const ROLE_DESTINATION: Record<string, string> = {
@@ -42,9 +47,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDemoModal, setShowDemoModal] = useState(false);
 
   const visibleAccounts = DEMO_ACCOUNTS.filter((acc) => acc.role === role);
   const copy = ROLE_COPY[role];
+  const supervisorAccounts = DEMO_ACCOUNTS.filter((acc) => acc.role === "supervisor");
+  const inspectorAccounts = DEMO_ACCOUNTS.filter((acc) => acc.role === "inspector");
+ 
+  function handleSelectDemo(acc: (typeof DEMO_ACCOUNTS)[number]) {
+    setEmail(acc.email);
+    setPassword(acc.password);
+    setRole(acc.role);
+    setShowDemoModal(false);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -88,9 +103,21 @@ export default function LoginPage() {
         />
       </div>
 
-      <button type="button" className="font-mono text-left text-xs text-muted underline-offset-2 hover:underline">
+      {/*<button type="button" className="font-mono text-left text-xs text-muted underline-offset-2 hover:underline">
         Having trouble signing in?
-      </button>
+      </button>*/}
+      <div className="flex items-center justify-between">
+         <button type="button" className="font-mono text-left text-xs text-muted underline-offset-2 hover:underline">
+           Having trouble signing in?
+         </button>
+         <button
+           type="button"
+           onClick={() => setShowDemoModal(true)}
+           className="font-mono text-xs text-accent underline-offset-2 hover:underline"
+         >
+           Use demo accounts
+        </button>
+       </div>
 
       {error && <p className="text-sm text-violation">{error}</p>}
 
@@ -103,7 +130,7 @@ export default function LoginPage() {
         {!isLoading && <ArrowRight className="opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300" size={16} />}
       </button>
 
-      {/*}<div className="mt-6">
+      {/*<div className="mt-6">
         <p className="mb-2 text-xs text-muted">Demo accounts — {role}</p>
         <ul className="divide-y divide-border rounded-card border border-border bg-surface">
           {visibleAccounts.map((acc) => (
@@ -201,6 +228,81 @@ export default function LoginPage() {
         {form}        
         </div>
       </div>
+{/* ---- Demo accounts modal ---- */}
+       <AnimatePresence>
+         {showDemoModal && (
+           <motion.div
+             className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-4"
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             exit={{ opacity: 0 }}
+             onClick={() => setShowDemoModal(false)}
+           >
+             <motion.div
+               className="w-full max-w-sm rounded-card bg-surface p-5 shadow-xl"
+               initial={{ opacity: 0, scale: 0.95, y: 10 }}
+               animate={{ opacity: 1, scale: 1, y: 0 }}
+               exit={{ opacity: 0, scale: 0.95, y: 10 }}
+               transition={{ duration: 0.15 }}
+               onClick={(e) => e.stopPropagation()}
+             >
+               <div className="mb-4 flex items-center justify-between">
+                 <h2 className="text-sm font-semibold text-ink">Demo accounts</h2>
+                 <button
+                   type="button"
+                   onClick={() => setShowDemoModal(false)}
+                   aria-label="Close"
+                   className="text-muted hover:text-ink"
+                 >
+                   <X size={18} />
+                 </button>
+               </div>
+ 
+               <div className="max-h-[70vh] space-y-4 overflow-y-auto">
+                 <div>
+                   <p className="mb-1.5 text-xs font-medium text-muted">Supervisor</p>
+                    <ul className="divide-y divide-border rounded-card border border-border overflow-hidden">
+                     {supervisorAccounts.map((acc) => (
+                       <li key={acc.email}>
+                         <button
+                           type="button"
+                           onClick={() => handleSelectDemo(acc)}
+                           className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-bg"
+                         >
+                           <div>
+                            <p className="text-sm font-medium text-ink">{acc.name}</p>
+                             <p className="text-xs text-muted">{acc.email}</p>
+                           </div>
+                         </button>
+                       </li>
+                     ))}
+                   </ul>
+                 </div>
+ 
+                 <div>
+                   <p className="mb-1.5 text-xs font-medium text-muted">Inspector</p>
+                   <ul className="divide-y divide-border rounded-card border border-border overflow-hidden">
+                     {inspectorAccounts.map((acc) => (
+                       <li key={acc.email}>
+                         <button
+                           type="button"
+                           onClick={() => handleSelectDemo(acc)}
+                           className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-bg"
+                         >
+                           <div>
+                             <p className="text-sm font-medium text-ink">{acc.name}</p>
+                             <p className="text-xs text-muted">{acc.email}</p>
+                           </div>
+                         </button>
+                       </li>
+                     ))}
+                   </ul>
+                </div>
+              </div>
+             </motion.div>
+           </motion.div>
+         )}
+      </AnimatePresence>
     </main>
   );
 }

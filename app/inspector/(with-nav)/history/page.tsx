@@ -147,17 +147,17 @@ export default function HistoryPage() {
             ) : (
               <motion.div
                 key={toDateParam(selectedDate)}
-                className="space-y-6"
+                className="space-y-6 w-full"
                 variants={dayVariants}
                 initial="hidden"
                 animate="show"
               >
                 {grouped.map(([hour, entries]) => (
-                  <div key={hour} className="flex gap-4">
+                  <div key={hour} className="w-full flex flex-col gap-4">
                     <div className="relative w-12 shrink-0 pt-3 text-xs text-muted">
                       {String(hour).padStart(2, "0")}:00
                     </div>
-                    <div className="grid flex-1 gap-2 border-l border-border pl-4 md:grid-cols-2 lg:gap-3">
+                    <div className="w-full grid flex-1 gap-2 border-l border-border pl-4 md:grid-cols-2 lg:gap-3">
                       {entries.map((scan) => (
                         <motion.button
                           key={scan.id}
@@ -166,7 +166,7 @@ export default function HistoryPage() {
                           whileHover={{ y: -2 }}
                           whileTap={{ scale: 0.99 }}
                           onClick={() => setActive(scan)}
-                          className="group flex items-center justify-between gap-3 rounded-card border border-border bg-surface px-4 py-3 text-left transition-[border-color,box-shadow] duration-200 hover:border-accent/60 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                          className="w-full group flex items-center justify-between gap-3 rounded-card border border-border bg-surface px-2 md:px-4 py-3 text-left transition-[border-color,box-shadow] duration-200 hover:border-accent/60 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                         >
                           <div className="flex min-w-0 items-center gap-3">
                             <ScanThumb scan={scan} className="h-9 w-9" iconSize={16} />
