@@ -171,7 +171,7 @@ export default function HistoryPage() {
                           <div className="flex min-w-0 items-center gap-3">
                             <ScanThumb scan={scan} className="h-9 w-9" iconSize={16} />
                             <div className="min-w-0">
-                              <p className="truncate text-sm font-medium text-ink">{scan.product}</p>
+                              <p className="truncate text-sm font-medium text-ink">{scan.product.length > 20 ? scan.product.slice(0, 20) + "..." : scan.product}</p>
                               <p className="text-xs text-muted">{scan.time}</p>
                             </div>
                           </div>
