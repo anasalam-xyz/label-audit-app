@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LabelAudit — Frontend (label-audit-app)
+
+> Live: https://label-audit.vercel.app/
+
+AI-assisted compliance checking for packaged commodities under the Legal Metrology (Packaged Commodities) Rules, 2011. This is the inspector and supervisor web application, built for Smart India Hackathon problem statement SIH26034.
+
+An inspector photographs a product label; the system extracts the mandatory declarations and checks them against the rules in seconds. Supervisors get a region-scoped view of compliance activity across their inspectors.
+
+## Stack
+
+- Next.js (App Router) + TypeScript
+- Tailwind CSS v4
+- Framer Motion
+- jsPDF + jspdf-autotable (client-side compliance report export)
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Requires the [backend API](https://github.com/anasalam-xyz/label-audit-api) running and reachable at the URL below.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create `.env.local`:
 
-## Learn More
+```
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-To learn more about Next.js, take a look at the following resources:
+Point this at your deployed backend URL in production.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+app/
+├── login/                → role-toggle login
+├── inspector/
+│   ├── page.tsx            → home: compliance ring, quick actions, recent scans
+│   ├── scan/page.tsx        → capture → review → compliance check → save flow
+│   │                           (single-scan and batch mode share this state machine)
+│   └── history/page.tsx     → date-filterable scan log
+└── supervisor/
+    ├── page.tsx              → console: regional stats, calendar, case feed
+    └── inspectors/page.tsx    → inspector roster and performance
 
-## Deploy on Vercel
+components/
+├── ui/                    → shared components (status chips, progress rings)
+├── inspector/scan/         → the scan flow's step components
+├── inspector/history/       → date strip, scan detail
+└── supervisor/               → console-specific components
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+lib/
+├── api/                   → typed API client functions, one file per resource
+├── scan-types.ts           → shared types for extraction/compliance data
+├── pdf-report.ts            → client-side PDF generation
+└── rule-aspects.ts           → frontend's copy of the five Legal Metrology
+                                 checks, mirrored from the backend's rule
+                                 engine — keep the two in sync by hand
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Core Flow
+
+1. **Capture** — camera or gallery upload of a product label
+2. **Extract** — the backend runs the photo through a vision model and returns structured field data
+3. **Review** — inspector can correct any low-confidence field before proceeding
+4. **Check** — the backend runs a deterministic rule check against the extracted fields
+5. **Result** — pass/violation/review verdict, per-rule breakdown
+6. **Save** — photo and results persist to the backend; a PDF report can be generated at this point
+
+Batch mode runs the same flow per photo across a captured set, auto-advancing between items and summarizing the whole run at the end.
+
+## Notable Design Decisions
+
+- The inspector-facing app and the supervisor console intentionally use different visual languages — a mobile field tool and a desktop analytics console are different contexts, not an inconsistency to resolve.
+- Field identity between extraction and compliance checking is matched on a stable key, not on display label text, since label wording isn't guaranteed to be consistent across extraction calls.
+- Extraction and compliance-checking are separate backend calls; the app doesn't assume either always succeeds and handles both failure paths independently.
